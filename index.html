@@ -1,0 +1,1727 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<LINK href="./style.css" rel="stylesheet" type="text/css">
+		<script type="text/javascript" src="./build/three.min.js"></script>
+		<script src="./examples/js/renderers/Projector.js"></script>
+		<script src="./examples/js/renderers/CanvasRenderer.js"></script>
+		<script type="text/javascript" src="./jquery-2.1.3.min.js"></script>
+
+		<script src="./examples/js/libs/stats.min.js"></script>
+		<script src="./examples/fonts/helvetiker_regular.typeface.js"></script>
+		<!-- load the font files -->
+
+		<script src="./examples/fonts/gentilis_bold.typeface.js"></script>
+		<script src="./examples/fonts/gentilis_regular.typeface.js"></script>
+		<script src="./examples/fonts/optimer_regular.typeface.js"></script>
+		<script src="./examples/fonts/helvetiker_bold.typeface.js"></script>
+		<script src="./examples/fonts/helvetiker_regular.typeface.js"></script>
+		<script src="./examples/fonts/droid/droid_sans_regular.typeface.js"></script>
+		<script src="./examples/fonts/droid/droid_sans_bold.typeface.js"></script>
+		<script src="./examples/fonts/droid/droid_serif_regular.typeface.js"></script>
+		<script src="./examples/fonts/droid/droid_serif_regular.typeface.js"></script>
+		<script src="./examples/fonts/droid/droid_serif_bold.typeface.js"></script>
+
+		<!-- todo async loader for fonts -->
+
+
+		<!-- replace built-in triangulation with PnlTri.js -->
+		<!--<script src="./examples/js/libs/pnltri.min.js"></script>-->
+    </head>
+    <body>
+	<div style="position:relative; background-color:rgb(88,88,88);">
+	<h1 style="color:rgb(255,255,255); padding:8px"> Cube System v1.0 </h1>
+	<div id="id_menu">
+	<input type="button" class="btn" value="toggle" onclick="func_tog();"></input>
+	<input type="button" class="btn" value="new mod" onclick="func_new();"></input>
+	<input type="button" class="btn" value="zoom out" onclick="func_bNav(1);"></input>
+	<input type="button" class="btn" value="zoom in" onclick="func_bNav(0);"></input>
+	<input type="button" class="btn" value="analysis" onclick="func_EmpFld();"></input>
+	<input type="button" id="listO" class="btn" value="hide Mods" onclick="func_listOpen();"></input>
+	<div id="list" style="padding-top:2px"></div>
+	<div id="id_frame"></div>
+	</div>
+	<div id="id_left" style="z-index:10">
+	<div id='id_grid' style='z-index:11; background-color:white'>
+	<div id="id_anal1"></div>
+	<div id="id_anal2"></div>
+	<div id="id_anal3"></div>
+	</div>
+	<div id="id_dt2"></div>
+	<div id="id_dt3"></div>
+	
+	</div>
+	<div id="id_right" style="z-index:10">
+	<form method="post" enctype="multipart/form-data" >
+    <input id='file' type="file" class="file_input" onchange='func_upload();'/>
+	</form>
+	<div id="values_xyz_id" style="z-index:10"></div>
+	<div id="id_dt1"></div>
+	</div>
+	</div>
+	<script type="text/javascript">
+var data = new Array();
+var enc_data = new Array();
+var val_Axisx = new Array();
+var valArr3 = new Array();
+var val_Axis3 = new Array();
+mx = 0;
+my = 0;
+mz = 0;
+	var container, stats;
+
+			var camera, scene, renderer;
+			renderer = new THREE.WebGLRenderer();
+
+			var mesh, geometry, mesh, geometry3, mesh3;
+			var group, group_b1, text, group2, group3;
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			document.addEventListener( 'click', onDocumentMouseClick, false );
+			
+			init();
+			var bool = false;
+			
+	var rotObjectMatrix;
+function rotateAroundObjectAxis(object, axis, radians) {
+    rotObjectMatrix = new THREE.Matrix4();
+    rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
+
+    // old code for THREE.JS pre r54:
+    // object.matrix.multiplySelf(rotObjectMatrix);      // post-multiply
+    // new code for THREE.JS r55+:
+    object.matrix.multiply(rotObjectMatrix);
+
+    // old code for THREE.js pre r49:
+    // object.rotation.getRotationFromMatrix(object.matrix, object.scale);
+    // old code for THREE.js r50-r58:
+    // object.rotation.setEulerFromRotationMatrix(object.matrix);
+    // new code for THREE.js r59+:
+    object.rotation.setFromRotationMatrix(object.matrix);
+}
+arrVals = new Array();
+ci1 = 0;
+ci2 = 0;
+ci3 = 0;
+res_xy = new Array();
+res_zy = new Array();
+res_zx = new Array();
+var text3d_x = new Array();
+var text3d_y = new Array();
+var text3d_z = new Array();
+text_x = new Array();
+text_y = new Array();
+text_z = new Array();
+func_new = function() {
+	location.reload();
+}
+func_servuslenkung = function() {
+	//void q7; then transparently fade in;
+	//make q8; then transparently fade in;
+	//thx to lovest DR. DIPLOMINGENEUR NEUBAUER BSC.
+}
+func_list = function() {
+	$.ajax({
+		  url: "backend.php?table=list_ch",
+		}).done(function() {
+		  $( this ).addClass( "done" );
+		});
+}
+var file;
+function func_save() {
+	$('#id_filen').remove();
+	$('#values_xyz_id').append("<form action='#' method='GET'><input id='id_filen' type='text' placeholder='filename'><input type='button' onclick='func_file()' value='submit'></a></input></form>");
+}
+function func_getArr() {
+	arr = new Array();
+	arr[0] = new Array();
+	arr[1] = new Array();
+	arr[2] = new Array();
+	var ctx = 0;
+	
+	arr[0][0] = ":" + $('#id_x').val();
+	arr[0][1] = ":" + $('#id_y').val();
+	arr[0][2] = ":" + $('#id_z').val();
+	
+	arr[1][0] = ":" + $('#id_tx0').val();
+	arr[1][1] = ":" + $('#id_ty0').val();
+	arr[1][2] = ":" + $('#id_tz0').val();
+	for(var ix = 0; ix < $('#id_x').val(); ix++) {
+		for(var iy = 0; iy < $('#id_y').val(); iy++) {
+			for(var iz = 0; iz < $('#id_z').val(); iz++) {
+				arr[2][ctx] = ":" + $('#id_s' + ctx).val();
+				ctx++;
+			}
+		}
+	}
+	ctx = 0;
+	return arr;
+}
+function func_file() {
+	var arrX = new Array();
+	arrX[0] = "Axis = {" + func_getArr()[0][0] + func_getArr()[0][1] + func_getArr()[0][2] + "};";
+	arrX[1] = "Texts = {" + func_getArr()[1][0] + func_getArr()[1][1] + func_getArr()[1][2] + "};";
+	arrX[2] = "Values = {" + func_getArr()[2].toString() + "};";
+	if($('#id_filen').val() != '') {
+			file = new Blob([arrX], {type: 'text/csv'});
+			if(window.navigator.msSaveOrOpenBlob) {
+				window.navigator.msSaveBlob(file, $('#id_filen').val() + ".cube");
+			}
+			else{
+				var elem = window.document.createElement('a');
+				elem.href = window.URL.createObjectURL(file);
+				elem.download = $('#id_filen').val() + ".cube";        
+				document.body.appendChild(elem)
+				elem.click();        
+				document.body.removeChild(elem);
+			}
+	} else {
+		alert("no filename given");
+	}
+}
+function func_upload() {
+	var url = 'backend.php?table=csv_file';
+        var req = new XMLHttpRequest();
+        var fd = new FormData();
+		var formData = new FormData();
+        fd.append('file', document.getElementById('file').files[0]);
+		$.ajax({
+            type: 'POST',
+            url: 'backend.php?table=choose_mod',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+				v_id = data.length;
+                //console.log(data);
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+        
+		req.open('POST', url, false);
+        req.onreadystatechange = function() {
+		if (req.readyState == 4 && req.status == 200) {
+			
+		}
+};
+        req.send(fd);
+		location.reload();
+}
+
+// Catch the form submit and upload the files
+    // we want to call this from dragleave and drop
+    function renderPreview(file) {
+        // Render a preview using FileReader
+    }
+datax = '';
+function func_listOpen() {
+	$('#list').toggle();
+}
+function func_choose() {
+	$('#list').show();
+	var formData = new FormData();
+               $.ajax({
+            type: 'POST',
+            url: 'backend.php?table=choose_mod',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+			myData2 = JSON.parse(data, function (key, value) {
+					var type;
+					if (value && typeof value === 'object') {
+						type = value.type;
+						if (typeof type === 'string' && typeof window[type] === 'function') {
+							return new (window[type])(value);
+						}
+					}
+					return value;
+				});
+				for(it_0 = 0; it_0 < myData2.length; it_0++) {
+					$('#list').append('<input type="button" class="btn" onclick="func_modCh(' + myData2[it_0].incr + ')" value="' + myData2[it_0].name + '"></input>');
+				}
+                //console.log(data);
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+    }
+function func_select(val) {
+	if(request_status === 0) {
+		//func_ok();
+	}
+	var formData = new FormData();
+	$.ajax({
+            type: 'POST',
+            url: 'backend.php?table=select_mod&id='+ val +'',
+			data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+				myData = JSON.parse(data, function (key, value) {
+					var type;
+					if (value && typeof value === 'object') {
+						type = value.type;
+						if (typeof type === 'string' && typeof window[type] === 'function') {
+							return new (window[type])(value);
+						}
+					}
+					return value;
+				});
+				func_build();
+				func_req_one();
+				func_reset();
+				renderer.setClearColor( 0xffffff, 1 );
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+}
+function func_modCh(val, lgth) {
+	$('#id_x').val('');
+	$('#id_y').val('');
+	$('#id_z').val('');
+	$('#id_tx0').val('');
+	$('#id_ty0').val('');
+	$('#id_tz0').val('');
+	$('#id_save').remove();
+	func_select(val);
+	it_g = val;
+	request_status = 1;
+	$('#values_xyz_id').append("<input id='id_save' type='button' class='btn' value='save' onclick='func_save();'></input>");
+}
+
+function func_tog() {
+	$('#id_right').toggle();
+	$('#id_left').toggle();
+}
+function func_bNav(dir) {
+	if(dir === 1) {
+		camera.position.z += 400; 
+	} else {
+		camera.position.z -= 400; 
+	}
+}
+vec2 = new Array();
+vec = new Array();
+request_status = 1;
+function func_ok_manual() {
+	if($('#id_x').val() !== "") {
+		if($('#id_y').val() !== "") {
+			if($('#id_z').val() !== "") {
+				request_status = 0;
+			} else {
+				request_status = 1;
+			}	
+		}	
+	}
+}
+	val_Axis = new Array();
+	val_Axis2 = new Array();
+	valVal = new Array();
+	valArr2 = new Array();
+	valTxtArr = new Array();
+	valTxt = new Array();
+	max_x = 0;
+	max_y = 0;
+	max_z = 0;
+	dtext_x = new Array();
+	dtext_y = new Array();
+	dtext_z = new Array();
+	arrInd = new Array();
+	arrInd[0] = new Array();
+	arrInd[1] = new Array();
+	arrInd[2] = new Array();
+	arrInd[3] = new Array();
+	var xArr = new Array();
+	var yArr = new Array();
+	var zArr = new Array();
+	var xArr2 = new Array();
+	var yArr2 = new Array();
+	var zArr2 = new Array();
+	var arrXYZ = new Array();
+	
+	function func_build() {
+	
+	func_ok_manual();
+	if(request_status === 0) {
+	arrXYZ[0] = parseInt(-$('#id_x').val())*560 / 2;
+	arrXYZ[1] = parseInt(-$('#id_y').val())*560 / 2;
+	arrXYZ[2] = -700;
+	$('#id_frame').empty();
+	// $('#values_xyz_id').hide();
+		
+		var axis = new THREE.Vector3(0.0,0.0,0.0);
+		group_b1 = new THREE.Group();
+		group = new THREE.Group();
+		group2 = new THREE.Group();
+		group3 = new THREE.Group();
+		ctr = 0;
+		ctr = 0;
+			for(var x = 0, z = 0; x < parseInt($('#id_x').val()); x++, z++) {
+				data[x] = new Array();
+				if(parseInt($('#id_x').val()) !== 0) {
+				dtext_x[x] = "x:" + x + " " + $('#id_tx' + 0).val();
+				xArr[x] = "x:" + x + " " + $('#id_tx' + 0).val();
+				xArr2[x] = $('#id_tx' + 0).val();
+				text3d_x[x] = new THREE.TextGeometry( xArr[x], {
+
+								size: 100,
+								height: 20,
+								curveSegments: 2,
+								font: "helvetiker"
+
+							});
+				text3d_x[x].computeBoundingBox();
+				var centerOffset = -0.5 * ( text3d_x[x].boundingBox.max.x - text3d_x[x].boundingBox.min.x );
+				var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
+				text_x[x] = new THREE.Mesh( text3d_x[x], textMaterial );
+				text_x[x].position.x = arrXYZ[0] +  0 + (560 * x);
+				text_x[x].position.y = arrXYZ[1] -560;
+				text_x[x].position.z = arrXYZ[2] -2000 + (parseInt($('#id_z').val()))*560;							
+				text_x[x].rotation.z = -1.0;
+				group.add( text_x[x] );
+				}
+				}
+				for(var y = 0; y < parseInt($('#id_y').val()); y++) {
+					data[y] = new Array();
+					if(parseInt($('#id_y').val()) !== 0) {
+					yArr[y] = "y:" + y + " " + $('#id_ty' + 0).val(); // utf-8 String.fromCharCode(0x25B6)
+					yArr2[y] = $('#id_ty' + 0).val(); 
+					dtext_y[y] = "y:" + y + " " + $('#id_ty' + 0).val();
+					text3d_y[y] = new THREE.TextGeometry( yArr[y], {
+
+								size: 100,
+								height: 20,
+								curveSegments: 2,
+								font: "helvetiker"
+
+							});
+					text3d_y[y].computeBoundingBox();
+					var centerOffset = -0.5 * ( text3d_y[y].boundingBox.max.x - text3d_y[y].boundingBox.min.x );
+					var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
+					text_y[y] = new THREE.Mesh( text3d_y[y], textMaterial );
+							text_y[y].position.x = arrXYZ[0] -($('#id_ty' + 0).val().length*110) - 560;
+							text_y[y].position.y = arrXYZ[1] + 0 + (560 * y);
+							text_y[y].position.z = arrXYZ[2] + -2000 + (parseInt($('#id_z').val()))*560;								
+							group.add( text_y[y] );	
+						}
+					}
+					for(var z = 0; z < parseInt($('#id_z').val()); z++) {
+					data[z] = new Array();
+					if(parseInt($('#id_z').val()) !== 0) {
+							zArr[z] = "z:" + z + " " + $('#id_tz' + 0).val();
+							zArr2[z] = $('#id_tz' + 0).val();
+							dtext_z[z] = "z:" + z + " " + $('#id_tz' + 0).val();
+							text3d_z[z] = new THREE.TextGeometry( zArr[z], {
+
+								size: 100,
+								height: 20,
+								curveSegments: 2,
+								font: "helvetiker"
+
+							});			
+
+							
+							
+							text3d_z[z].computeBoundingBox();
+							
+							
+							var centerOffset = -0.5 * ( text3d_z[z].boundingBox.max.x - text3d_z[z].boundingBox.min.x );
+
+							var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
+							
+							
+							text_z[z] = new THREE.Mesh( text3d_z[z], textMaterial );
+
+							text_z[z].position.x = arrXYZ[0] + parseInt($('#id_x').val())*560;
+							text_z[z].position.y = arrXYZ[1];
+							text_z[z].position.z = arrXYZ[2] + -2000 + parseInt($('#id_z').val())*560 - (z) * 560;
+							group.add( text_z[z] );
+						}
+					}
+					
+					scene = new THREE.Scene();
+		scene.add( group );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		container.appendChild( stats.domElement );
+		camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 60000 );
+        camera.position.z = $('#id_z').val()*560 - 700;
+
+		geometry = new Array();
+		geometry3 = new Array();
+		material = new Array();
+		material2 = new Array();
+		material3 = new Array();
+		mesh = new Array();
+		mesh2 = new Array();
+		mesh3 = new Array();
+		helper = new Array();
+		helper2 = new Array();
+		helper3 = new Array();
+		var ctr = 0;
+		var ctr2 = 0;
+        var ctr3 = 0;
+			for(var it_0 = 0; it_0 < parseInt($('#id_x').val()); it_0++) {
+				for(var it_1 = 0; it_1 < parseInt($('#id_y').val()); it_1++) {
+					for(var it_2 = 0; it_2 < parseInt($('#id_z').val()); it_2++) {
+						data[it_0].x = new Array();
+						data[it_1].y = new Array();
+						data[it_2].z = new Array();
+						data[it_0].x.m1 = new THREE.Vector3();
+						data[it_1].y.m1 = new THREE.Vector3();
+						data[it_2].z.m1 = new THREE.Vector3();
+						
+						data[it_0].x.m2 = new THREE.Vector3();
+						data[it_1].y.m2 = new THREE.Vector3();
+						data[it_2].z.m2 = new THREE.Vector3();
+						
+						data[it_0].x.m3 = new THREE.Vector3();
+						data[it_1].y.m3 = new THREE.Vector3();
+						data[it_2].z.m3 = new THREE.Vector3();
+						
+						if(arrCtr[0][ctr] !== 'x') {
+							var max = 1.0;
+							for (var i = 0; i < arrsz[1].length; i++) { 
+								if (arrsz[1][i] > max) max = arrsz[1][i];
+							}
+							div =  max;
+														
+							geometry[ctr] = new THREE.BoxGeometry(400 * (arrsz[1][ctr] / div) , 400 * (arrsz[1][ctr] / div), 400 * (arrsz[1][ctr] / div)); 
+									material[ctr] = new THREE.MeshBasicMaterial( { color: $('#id_s' + ctr).val()* 0xffffff,transparent: true, opacity: 0.5 } );
+
+									mesh[ctr] = new THREE.Mesh( geometry[ctr], material[ctr] );
+									mesh[ctr].position.x =  arrXYZ[0] + 0 + it_0 * 560;
+									data[it_0].x.m1.x = 0 + it_0 * 560;
+									mesh[ctr].position.y =  arrXYZ[1] +($('#id_y').val()-1)*560 - it_1 * 560;
+									data[it_1].y.m1.y = ($('#id_y').val()-1)*560 - it_1 * 560;
+									mesh[ctr].position.z =  arrXYZ[2] + -2000 +  (it_2) * 560 + 280;
+									data[it_2].z.m1.z =  -2000 +  (it_2) * 560 + 280;
+							geometry[ctr] = new THREE.BoxGeometry(400 * (arrsz[1][ctr] / div) , 400 * (arrsz[1][ctr] / div), 400 * (arrsz[1][ctr] / div)); 
+									material2[ctr] = new THREE.MeshBasicMaterial({
+        wireframe: true, opacity: 0,
+        color: 'black' } );
+
+									mesh2[ctr2] = new THREE.Mesh( geometry[ctr], material[ctr] );
+									mesh2[ctr2].position.x =  arrXYZ[0] + it_0 * 560;
+									data[it_0].x.m2.x = 0 + it_0 * 560;
+									mesh2[ctr2].position.y =  arrXYZ[1] + ($('#id_y').val() - 1)*560 - it_1 * 560;
+									data[it_1].y.m2.y = ($('#id_y').val() - 1)*560 - it_1 * 560;
+									mesh2[ctr2].position.z =  arrXYZ[2] + -2000 +  (it_2) * 560 + 280;
+									data[it_2].z.m2.z = z = -2000 +  (it_2) * 560 + 280;
+									helper[ctr] = new THREE.BoxHelper(mesh[ctr]);	
+									helper2[ctr2] = new THREE.BoxHelper(mesh2[ctr2]);									
+									helper2[ctr2] = new THREE.BoxHelper(mesh2[ctr2]);
+									helper[ctr].material.color.setHex( 0x000000 );
+									helper[ctr].material.linewidth = 2;	
+									helper2[ctr2].material.color.setHex( 0x000000 );
+									helper2[ctr2].material.linewidth = 2;													
+									group2.add(mesh[ctr]);
+									group2.add(mesh2[ctr2]);
+									group2.add(helper2[ctr2]);
+									scene.add(group2);
+									
+geometry3[ctr3] = new THREE.BoxGeometry( 540, 540, 540);
+									material3[ctr3] = new THREE.MeshBasicMaterial({ color: 0.4*0xff0000, side: THREE.BackSide, transparent: true, opacity: 0.5 , depthTest: true });
+
+									mesh3[ctr3] = new THREE.Mesh( geometry3[ctr3], material3[ctr3] );
+									mesh3[ctr3].position.x =  arrXYZ[0] + it_0 * 560;
+									data[it_0].x.m3.x = 0 + it_0 * 560;
+									mesh3[ctr3].position.y =  arrXYZ[1] + ($('#id_y').val() - 1)*560 - it_1 * 560;
+									data[it_1].y.m3.y = ($('#id_y').val() - 1)*560 - it_1 * 560;
+									mesh3[ctr3].position.z =  arrXYZ[2] + -2000 +  (it_2) * 560 + 280;
+									data[it_2].z.m3.z = z = -2000 +  (it_2) * 560 + 280;
+								    helper3[ctr3] = new THREE.BoxHelper(mesh3[ctr3]);
+									helper3[ctr3].material.color.set( 0x000000 );
+									helper3[ctr3].material.linewidth = 2;	
+									group3.add(mesh3[ctr3]);
+									scene.add(group3);
+				
+				
+				} else {
+					geometry3[ctr3] = new THREE.BoxGeometry( 540, 540, 540);
+									material3[ctr3] = new THREE.MeshBasicMaterial({ color: 0.4*0xff0000, side: THREE.BackSide, transparent: true, opacity: 0.5 , depthTest: true });
+
+									mesh3[ctr3] = new THREE.Mesh( geometry3[ctr3], material3[ctr3] );
+									mesh3[ctr3].position.x =  arrXYZ[0] + it_0 * 560;
+									data[it_0].x.m3.x = 0 + it_0 * 560;
+									mesh3[ctr3].position.y =  arrXYZ[1] + ($('#id_y').val() - 1)*560 - it_1 * 560;
+									data[it_1].y.m3.y = ($('#id_y').val() - 1)*560 - it_1 * 560;
+									mesh3[ctr3].position.z =  arrXYZ[2] + -2000 +  (it_2) * 560 + 280;
+group3.add(mesh3[ctr3]);			data[it_2].z.m3.z = z = -2000 +  (it_2) * 560 + 280;
+									helper3[ctr3] = new THREE.BoxHelper(mesh3[ctr3]);		
+									helper3[ctr3].material.color.set( 0x000000 );
+									helper3[ctr3].material.linewidth = 2;
+									group3.add(helper3[ctr]);
+									scene.add(group3);	
+				}
+				ctr++;
+				ctr2++;
+				ctr3++;
+				}
+				}
+				}
+				 
+        renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.domElement.id = "id_canv";
+        $('#id_frame').append( renderer.domElement );
+				animate();
+		} 
+		if(request_status === 1) {
+		arrXYZ[0] = -max_x*560 / 2;
+		arrXYZ[1] = -max_y*560 / 2;
+		arrXYZ[2] = 0;
+		$('#id_frame').empty();
+	// $('#values_xyz_id').hide();
+		
+		var axis = new THREE.Vector3(0.0,0.0,0.0);
+		group_b1 = new THREE.Group();
+		group = new THREE.Group();
+		group2 = new THREE.Group();
+		group3 = new THREE.Group();
+		helper = new Array();
+		helper2 = new Array();
+		helper3 = new Array();		
+		valArr = new Array();
+		valArrsp = new Array();
+		valArr = myData[0].Axis.split(';');
+		
+		valArrsp[0] = valArr[0];
+		valArrsp[1] = valArr[1];
+		valArrsp[2] = valArr[2];
+		// not odd
+		arrInd[0][0] = valArrsp[0];
+		arrInd[1][0] = valArrsp[1];
+		arrInd[2][0] = valArrsp[2];
+		
+		max_x = 0;
+		max_y = 0;
+		max_z = 0;
+		
+		if (parseInt(arrInd[0][0].split(':')[1]) > max_x) max_x = parseInt(arrInd[0][0].split(':')[1].trim());
+		if (parseInt(arrInd[0][0].split(':')[2]) > max_y) max_y = parseInt(arrInd[0][0].split(':')[2].trim());
+		if (parseInt(arrInd[0][0].split(':')[3]) > max_z) max_z = parseInt(arrInd[0][0].split(':')[3].trim());
+		ctrv = 0;
+			for(var x = 0, z = 0; x < max_x; x++, z++) {
+				xArr[x] = "x:" + x + " " + arrInd[1][0].split(':')[1].trim();
+				xArr2[x] = arrInd[1][0].split(':')[1].trim();
+				text3d_x[x] = new THREE.TextGeometry( xArr[x], {
+
+								size: 100,
+								height: 20,
+								curveSegments: 2,
+								font: "helvetiker"
+
+							});
+				text3d_x[x].computeBoundingBox();
+				var centerOffset = -0.5 * ( text3d_x[x].boundingBox.max.x - text3d_x[x].boundingBox.min.x );
+				var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
+				text_x[x] = new THREE.Mesh( text3d_x[x], textMaterial );
+				text_x[x].position.x =  arrXYZ[0] + (560 * x);
+				text_x[x].position.y =  arrXYZ[1] + -1120;
+				text_x[x].position.z = arrXYZ[2] + -2000 + (max_z)*560 + 560;							
+				text_x[x].rotation.z = -1.0;
+				group.add( text_x[x] );
+				
+				ctrv++;
+				}
+				for(var y = 0; y < max_y; y++) {
+					yArr[y] = "y:" + y + " " + arrInd[1][0].split(':')[2].trim(); // utf-8 String.fromCharCode(0x25B6)
+					yArr2[y] = arrInd[1][0].split(':')[2].trim();
+					text3d_y[y] = new THREE.TextGeometry( yArr[y], {
+
+								size: 100,
+								height: 20,
+								curveSegments: 2,
+								font: "helvetiker"
+
+							});
+					text3d_y[y].computeBoundingBox();
+					var centerOffset = -0.5 * ( text3d_y[y].boundingBox.max.x - text3d_y[y].boundingBox.min.x );
+					var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
+					text_y[y] = new THREE.Mesh( text3d_y[y], textMaterial );
+							text_y[y].position.x = arrXYZ[0] + -(arrInd[2][0].length*110) - 560;
+							text_y[y].position.y = arrXYZ[1] + (560 * (y-1));
+							text_y[y].position.z = arrXYZ[2] + -2000 + (max_z)*560 + 560;								
+							group.add( text_y[y] );	
+						ctrv++;
+					}
+					for(var z = 0; z < max_z; z++) {
+							zArr[z] = "z:" + z + " " + arrInd[1][0].split(':')[3].replace('}','').trim();
+							zArr2[z] = arrInd[1][0].split(':')[3].replace('}','').trim();
+							text3d_z[z] = new THREE.TextGeometry( zArr[z], {
+
+								size: 100,
+								height: 20,
+								curveSegments: 2,
+								font: "helvetiker"
+
+							});			
+
+							
+							
+							text3d_z[z].computeBoundingBox();
+							
+							
+							var centerOffset = -0.5 * ( text3d_z[z].boundingBox.max.x - text3d_z[z].boundingBox.min.x );
+
+							var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
+							
+							
+							text_z[z] = new THREE.Mesh( text3d_z[z], textMaterial );
+
+							text_z[z].position.x = arrXYZ[0] + (max_x)*560 + 560;
+							text_z[z].position.y = arrXYZ[1] + -560;
+							text_z[z].position.z = arrXYZ[2] + -2000 + (max_z)*560 - (z-1) * 560;
+							group.add( text_z[z] );
+						ctrv++;
+					}
+					
+					scene = new THREE.Scene();
+		scene.add( group );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		stats = new Stats();
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.top = '0px';
+		container.appendChild( stats.domElement );
+		camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 60000 );
+		
+
+		geometry = new Array();
+		geometry3 = new Array();
+		material = new Array();
+		material2 = new Array();
+		material3 = new Array();
+		mesh = new Array();
+		mesh2 = new Array();
+		mesh3 = new Array();
+		var ctr = 0;
+		var ctr2 = 0;
+        var ctr3 = 0;
+			
+			for(var it_0 = 0; it_0 < max_x; it_0++) {
+				for(var it_1 = 0; it_1 < max_y; it_1++) {
+					for(var it_2 = 0; it_2 < max_z; it_2++) {
+						if(arrCtr[0][ctr] !== 'x') {
+							var max = 1.0;
+							for (var i = 0; i < arrInd[0][0].split(':').length; i++) { 
+								if (arrInd[0][0].split(':')[i + 1] > max) max = arrInd[0][0].split(':')[i + 1];
+							}
+							div =  max;
+							geometry[ctr] = new THREE.BoxGeometry(400 * (arrInd[0][ctr + 1] / div) , 400 * (arrInd[0][ctr + 1] / div), 400 * (arrInd[0][ctr + 1] / div));
+									material[ctr] = new THREE.MeshBasicMaterial( { color: $('#id_s' + ctr).val()* 0xffffff,transparent: true, opacity: 0.5 } );
+
+									mesh[ctr] = new THREE.Mesh( geometry[ctr], material[ctr] );
+									mesh[ctr].position.x = arrXYZ[0] + it_0 * 560;
+									mesh[ctr].position.y = arrXYZ[1] +(max_y-1)*560 - it_1 * 560;
+									mesh[ctr].position.z = arrXYZ[2] +-2000 +  (it_2) * 560 + 280;
+							geometry[ctr] = new THREE.BoxGeometry(400 * (arrInd[0][0].split(':')[ctr + 1] / div) , 400 * (arrInd[0][0].split(':')[0][ctr + 1] / div), 400 * (arrInd[0][0].split(':')[ctr + 1] / div));
+									material2[ctr] = new THREE.MeshBasicMaterial({
+        wireframe: true, opacity: 0, 
+        color: 'black' } );
+
+									mesh2[ctr2] = new THREE.Mesh( geometry[ctr], material[ctr] );
+									mesh2[ctr2].position.x = arrXYZ[0] + it_0 * 560;
+									mesh2[ctr2].position.y = arrXYZ[1] + (max_y - 1)*560 - it_1 * 560;
+									mesh2[ctr2].position.z = arrXYZ[2] + -2000 +  (it_2) * 560 + 280;	
+									helper2[ctr2] = new THREE.BoxHelper(mesh2[ctr2]);
+									helper2[ctr2].material.color.setHex( 0x000000 );	
+									group2.add(mesh[ctr]);
+									group2.add(mesh2[ctr2]);
+									
+									group2.add(helper2[ctr2]);
+									scene.add(group2);
+									
+geometry3[ctr3] = new THREE.BoxGeometry( 540, 540, 540);
+									material3[ctr3] = new THREE.MeshBasicMaterial({ color: 0.4*0xff0000, side: THREE.BackSide, transparent: true, opacity: 0.5 , depthTest: true });
+
+									mesh3[ctr3] = new THREE.Mesh( geometry3[ctr3], material3[ctr3] );
+									mesh3[ctr3].position.x = arrXYZ[0] + it_0 * 560;
+									mesh3[ctr3].position.y = arrXYZ[1] + (max_y - 1)*560 - it_1 * 560;
+									mesh3[ctr3].position.z = arrXYZ[2] + -2000 +  (it_2) * 560 + 280;	
+									helper3[ctr3] = new THREE.BoxHelper(mesh2[ctr3]);
+									helper3[ctr3].material.color.setHex( 0x000000 );	
+									group3.add(mesh3[ctr3]);
+									group3.add(helper3[ctr3]);
+									scene.add(group3);
+				
+				
+				} else {
+					geometry3[ctr3] = new THREE.BoxGeometry( 540, 540, 540);
+									material3[ctr3] = new THREE.MeshBasicMaterial({ color: 0.4*0xff0000, side: THREE.BackSide, transparent: true, opacity: 0.5 , depthTest: true });
+
+									mesh3[ctr3] = new THREE.Mesh( geometry3[ctr3], material3[ctr3] );
+									mesh3[ctr3].position.x = arrXYZ[0] + it_0 * 560;
+									mesh3[ctr3].position.y = arrXYZ[1] + (max_y - 1)*560 - it_1 * 560;
+									mesh3[ctr3].position.z = arrXYZ[2] + -2000 +  (it_2) * 560 + 280;
+group3.add(mesh3[ctr3]);			helper3[ctr3] = new THREE.BoxHelper(mesh2[ctr3]);
+									group3.add(mesh3[ctr3]);
+									group3.add(helper3[ctr3]);
+									scene.add(group3);	
+				}
+				ctr++;
+				ctr2++;
+				ctr3++;
+				}
+				}
+				}
+				ctr = 0;
+				ctr2 = 0;
+				ctr3 = 0;				
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.domElement.id = "id_canv";
+		renderer.setClearColor( 0xffffff, 1 );
+        $('#id_frame').append( renderer.domElement );
+				animate();
+		}
+}
+var arrCtr = new Array();
+arrCtr[0] = new Array();
+arrCtr[1] = new Array();
+arrCtr[2] = new Array();
+var arrsz = new Array();
+arrsz[0] = new Array();
+arrsz[1] = new Array();
+arrsz[2] = new Array();
+arrTextx = new Array();
+arrTexty = new Array();
+arrTextz = new Array();
+$(document).scroll(function() {
+  $('#id_frame').css('top', 20 + $(document).scrollTop() + 'px');
+});
+varLength = 0;
+function func_unlock(val, a) {
+		if(a === 0) {
+			if(arrCtr[0][val] === 'x') {
+				arrCtr[0][val] = 'd';
+				$('#id_b' + val).css("background", "rgb(133,133,233)");
+				$('#id_d' + val).css("background", "rgb(133,133,233)");
+				func_reset();
+				func_build();
+			} else {
+				arrCtr[0][val] = 'x';
+				$('#id_b' + val).css("background", "#ff0000");
+				$('#id_d' + val).css("background", "#ff0000");
+				func_reset();
+				func_build();
+			}
+		} else {
+		if(arrCtr[0][val] === 'x') {
+				arrCtr[0][val] = 'd';
+				$('#id_b' + val).css("background", "rgb(133,133,233)");
+				$('#id_d' + val).css("background", "rgb(133,133,233)");
+				func_reset();
+				func_build();
+			} else {
+				arrCtr[0][val] = 'x';
+				$('#id_b' + val).css("background", "#ff0000");
+				$('#id_d' + val).css("background", "#ff0000");
+				func_reset();
+				func_build();
+			}
+		}
+}
+function func_del(val, a) {
+		if(a === 0) {
+			if(arrCtr[0][val] !== 'x') {
+				arrCtr[0][val] = 'x';
+				$('#id_b' + val).css("background", "#ff0000");
+				$('#id_d' + val).css("background", "#ff0000");
+				func_reset();
+				func_build();
+			} else {
+				arrCtr[0][val] = 'd';
+				$('#id_b' + val).css("background", "rgb(133,133,233)");
+				$('#id_d' + val).css("background", "rgb(133,133,233)");
+				func_reset();
+				func_build();
+			}
+		} else {
+		if(arrCtr[0][val] !== 'x') {
+				arrCtr[0][val] = 'x';
+				$('#id_b' + val).css("background", "#ff0000");
+				$('#id_d' + val).css("background", "#ff0000");
+				func_reset();
+				func_build();
+			} else {
+				arrCtr[0][val] = 'd';
+				
+				$('#id_b' + val).css("background", "rgb(133,133,233)");
+				$('#id_d' + val).css("background", "rgb(133,133,233)");
+				func_reset();
+				func_build();
+			}
+			
+		}
+		$('#id_dt3').children().remove();
+}
+var it_g = 0;
+function func_highl(val, a) {
+		if(a === 0) {
+		if(arrCtr[0][val] !== 'x') {
+			helper2[val].material.color.setHex(4.0 * 0x00ffff);
+			helper2[val].material.opacity = 0.5;
+			helper2[val].material.transparent = true;
+		}
+		} else {
+			if(arrCtr[0][val] !== 'x') {
+				helper2[val].material.color.setHex(4.0 * 0x000000);
+				helper2[val].material.opacity = 0.5;
+				helper2[val].material.transparent = true;
+			}
+		}
+}
+var size = 1.0;
+var div = 1.0;
+function func_invSize(val, a) {
+		func_reset();
+		func_build();
+}
+function func_reset() {
+	var ctr = 0;
+	var pw = 1;
+	if(request_status === 0) {
+		for(var x = 0; x < parseInt($('#id_x').val()); x++) {
+						for(var y = parseInt($('#id_y').val()) - 1; y >= 0 ; y--) {
+							for(var z = parseInt($('#id_z').val()) - 1; z >= 0 ; z--) {
+							arrsz[0][ctr] = 'd';
+							if(arrCtr[0][ctr] !== 'x') {
+								arrsz[1][ctr] = parseFloat($('#id_s' + ctr).val());
+							} else {
+								arrsz[1][ctr] = 1.0;
+							}
+							ctr++;	
+				}
+			}
+		}
+	} else {
+			pw = 1;
+			ctr = 0;
+			parseInt($('#id_x').val(max_x));
+			parseInt($('#id_y').val(max_y));
+			parseInt($('#id_z').val(max_z));
+			for(var x = max_x - 1; x >= 0; x--) {
+						for(var y = max_y - 1; y >= 0 ; y--) {
+							for(var z = max_z - 1; z >= 0 ; z--) {
+							$('#id_s' + ctr).val(parseFloat(arrInd[2][0].split(':')[ctr + 1]));
+							arrsz[0][ctr] = 'd';
+							if(arrCtr[0][ctr] !== 'x') {
+								arrsz[1][ctr] = parseFloat(arrInd[2][0].split(':')[ctr + 1]);
+							} else {
+								arrsz[1][ctr] = 1.0;
+							}
+							ctr++;	
+				}
+			}
+		}
+		func_build();
+	}
+	
+}
+arri = new Array();
+arri[0] = new Array();
+arri[1] = new Array();
+arri[2] = new Array();
+function func_ctr(ctr, val) {
+    var it = 0;
+
+	if(-ctr + ((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1)) >=  val*0 && (-ctr + ((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1))) <  val*1 ) {
+			arri[it][ctr] = val; 
+			it++;
+	} 
+	if(-ctr + ((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1)) >=  val*1 && (-ctr + ((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1))) <  val*2  ) {
+			arri[it][ctr] = val;
+			it++;
+	} 
+	if(-ctr + ((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1)) >=  val*2 && (-ctr + ((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1))) <  (((parseInt($('#id_x').val()) - 1)+(parseInt($('#id_y').val()) - 1)+(parseInt($('#id_z').val()) - 1)) + 1)) {
+			arri[it][ctr] = val;
+			it++;
+	}
+	return arri;
+}
+max = new Array();
+mod = new Array();
+lock = 0;
+function func_lock(x2, y2 , z2, lw, ctx, ax) {
+		cr = 0;
+		var ct = 0;
+		lock = 0;
+		if(request_status === 0) {
+		if(mod[ctx] % 2 == 0) {
+			if(ax === 0) {
+				$('#id_lockX' + ctx).css("background-color", "rgb(255,0,0)");
+			} else {
+				$('#id_lockY' + ctx).css("background-color", "rgb(255,0,0)");
+			}
+			for(var x = 0; x < max[0]; x++) {		
+				for(var y = max[1] - 1; y >= 0 ; y--) {		
+					for(var z = max[2] - 1; z >= 0 ; z--) {
+						if(arrCtr[0][ct] !== 'x') {
+							if(lw === 2 && y === y2 && z === z2) {
+								
+								func_del(ct,1);
+								
+								
+							}
+							if(lw === 1 && x === x2 && z === z2) {
+								
+								func_del(ct,1);
+								
+							}
+							if(lw === 3 &&  x === x2 && y === y2) {
+								
+								func_del(ct,1);
+							}
+							
+						}
+						ct++;
+					}
+				}
+			}
+			mod[ctx]++;
+		} else {
+			if(ax === 0) {
+				$('#id_lockX' + ctx).css("background-color", "rgb(133,133,233)");
+			} else {
+				$('#id_lockY' + ctx).css("background-color", "rgb(133,133,233)");
+			}
+			ct = 0;
+			mod[ctx] = 0;
+				for(var x = 0; x < max[0]; x++) {		
+				for(var y = max[1] - 1; y >= 0 ; y--) {		
+					for(var z = max[2] - 1; z >= 0 ; z--) {
+						if(arrCtr[0][ct] === 'x') {
+							if(lw === 2 && y === y2 && z === z2) {
+							
+									func_unlock(ct,1);
+									
+								}
+								if(lw === 1 && x === x2 && z === z2) {
+									
+									func_unlock(ct,1);
+									
+								}
+								if(lw === 3 &&  x === x2 && y === y2) {
+									
+									func_unlock(ct,1);
+								}
+							
+						}
+						ct++;
+					}
+				}
+			}
+		}
+		} else {
+		if(mod[ctx] % 2 == 0) {
+							if(ax === 0) {
+								$('#id_lockX' + ctx).css("background-color", "rgb(255,0,0)");
+							} else {
+								$('#id_lockY' + ctx).css("background-color", "rgb(255,0,0)");
+							}
+							for(var x = 0; x <= max[0]; x++) {		
+								for(var y = max[1] - 1; y >= 0 ; y--) {		
+									for(var z = max[2] - 1; z >= 0 ; z--) {
+										if(arrCtr[0][ct] !== 'x') {
+											if(lw === 2 && y === y2 && z === z2) {
+												
+												func_del(ct,1);
+												
+											}
+											if(lw === 1 && x === x2 && z === z2) {
+												
+												func_del(ct,1);
+												
+											}
+											if(lw === 3 &&  x === x2 && y === y2) {
+												
+												func_del(ct,1);
+											}
+											
+										}
+										ct++;
+									}
+								}
+							}
+			mod[ctx]++;
+		} else {
+			if(ax === 0) {
+				$('#id_lockX' + ctx).css("background-color", "rgb(133,133,233)");
+			} else {
+				$('#id_lockY' + ctx).css("background-color", "rgb(133,133,233)");
+			}
+			ct = 0;
+			mod[ctx] = 0;
+							for(var x = 0; x < max[0]; x++) {		
+							for(var y = max[1] - 1; y >= 0 ; y--) {		
+								for(var z = max[2] - 1; z >= 0 ; z--) {
+									if(arrCtr[0][ct] === 'x') {	
+										if(lw === 2 && y === y2 && z === z2) {
+										
+												func_unlock(ct,1);
+												
+											}
+											if(lw === 1 && x === x2 && z === z2) {
+												
+												func_unlock(ct,1);
+												
+											}
+											if(lw === 3 &&  x === x2 && y === y2) {
+												
+												func_unlock(ct,1);
+											}
+										
+									}
+									ct++;
+								}
+							}
+						}
+					}
+		}
+		func_reset();
+		func_build();
+		
+}
+function func_detail(val, x, y, z) {
+	$('#id_dt3').children().remove();
+	if(request_status === 0) {
+		if(arrCtr[0][val] !== 'x') {
+				for(var it_0 = 0; it_0 < material.length;it_0++) {
+				if(material[it_0] !== undefined) {
+						material[it_0].color.setHex(4.0 * 0xffffff);
+						material[it_0].opacity = 0.5;
+						material[it_0].transparent = true;
+						$('#id_d' + it_0).css("background-color", "rgb(133,133,233)");
+					}
+				}
+				$('#id_dt3').append("<p id='tax_"+ val +"'> cmp_x: " + dtext_x[x] + " </p>");
+				$('#id_dt3').append("<p id='tay_"+ val +"'> cmp_y: " + dtext_y[y] + " </p>");
+				$('#id_dt3').append("<p id='taz_"+ val +"'> cmp_z: " + dtext_z[z] + " </p>");
+				$('#id_dt3').append("<p id='tax_"+ val +"'> value: " + $('#id_s' + val).val() + " </p>");
+				
+			$('#id_d' + val).css("background-color", "rgb(0,255,255)");
+			material[val].color.setHex(4.0 * 0x00ffff);
+			material[val].opacity = 0.5;
+			material[val].transparent = true;
+		} else {
+			func_del(val,1);
+			for(var it_0 = 0; it_0 < material.length;it_0++) {
+					if(material[it_0] !== undefined) {
+						material[it_0].color.setHex(4.0 * 0xffffff);
+						material[it_0].opacity = 0.5;
+						material[it_0].transparent = true;
+						$('#id_d' + it_0).css("background-color", "rgb(133,133,233)");
+					} else {
+						$('#id_d' + val).css("background-color", "rgb(0,255,255)");
+					}
+				}
+				$('#id_dt3').children().remove();
+				$('#id_dt3').append("<p id='tax_"+ val +"'> cmp_x: " + dtext_x[x] + " </p>");
+				$('#id_dt3').append("<p id='tay_"+ val +"'> cmp_y: " + dtext_y[y] + " </p>");
+				$('#id_dt3').append("<p id='taz_"+ val +"'> cmp_z: " + dtext_z[z] + " </p>");
+				$('#id_dt3').append("<p id='tax_"+ val +"'> value: " + $('#id_s' + val).val() + " </p>");
+				arrCtr[0][val] = 'd';
+				func_detail(val,x,y,z);
+		}
+	} else {
+	if(arrCtr[0][val] !== 'x') {
+				for(var it_0 = 0; it_0 < material.length;it_0++) {
+					if(material[it_0] !== undefined) {
+						material[it_0].color.setHex(4.0 * 0xffffff);
+						material[it_0].opacity = 0.5;
+						material[it_0].transparent = true;
+						$('#id_d' + it_0).css("background-color", "rgb(133,133,233)");
+					}
+				}
+				$('#id_dt3').append("<p id='tax_"+ val +"'> cmp_x: " + arrInd[1][0].split(':')[1].trim() + " </p>");
+				$('#id_dt3').append("<p id='tay_"+ val +"'> cmp_y: " + arrInd[1][0].split(':')[2].trim() + " </p>");
+				$('#id_dt3').append("<p id='taz_"+ val +"'> cmp_z: " + arrInd[1][0].split(':')[3].trim() + " </p>");
+				$('#id_dt3').append("<p id='tax_"+ val +"'> value: " + $('#id_s' + val).val() + " </p>");
+				
+			$('#id_d' + val).css("background-color", "rgb(0,255,255)");
+			material[val].color.setHex(4.0 * 0x00ffff);
+			material[val].opacity = 0.5;
+			material[val].transparent = true;
+		} else {
+			func_del(val,1);
+			for(var it_0 = 0; it_0 < material.length;it_0++) {
+					if(material[it_0] !== undefined) {
+						material[it_0].color.setHex(4.0 * 0xffffff);
+						material[it_0].opacity = 0.5;
+						material[it_0].transparent = true;
+						$('#id_d' + it_0).css("background-color", "rgb(133,133,233)");
+					}
+				}
+				$('#id_dt3').children().remove();
+				$('#id_dt3').append("<p id='tax_"+ val +"'> cmp_x: " + dtext_x[x] + " </p>");
+				$('#id_dt3').append("<p id='tay_"+ val +"'> cmp_y: " + dtext_y[y] + " </p>");
+				$('#id_dt3').append("<p id='taz_"+ val +"'> cmp_z: " + dtext_z[z] + " </p>");
+				$('#id_dt3').append("<p id='tax_"+ val +"'> value: " + $('#id_s' + val).val() + " </p>");
+				arrCtr[0][val] = 'd';
+				func_detail(val,x,y,z);
+		}
+	}
+}
+function func_lookup(val) {
+	console.log($('#scrtag' + val).val());
+}
+function func_req_one() {
+	$('#id_dt1').children().remove();
+	$('#id_dt2').children().remove();
+			$('#xa').children().children().remove();
+			$('#ya').children().children().remove();
+			$('#za').children().children().remove();
+			$('#_a').children().remove();
+			ctr = 0;
+			ctra = 0;
+			it = 0;
+			max[0] = max_x;
+			max[1] = max_y;
+			max[2] = max_z;
+			cr = 0;
+			if(lock % 2 === 0) {
+				for(var x = 0; x <= max[0]; x++) {		
+					for(var y = max[1] - 1; y >= 0 ; y--) {		
+						for(var z = max[2] - 1; z >= 0 ; z--) {
+							mod[cr] = 0;
+							cr++;
+						}
+					}
+				}
+				cr = 0;
+				}
+				lock = 1;
+			$('#id_dt2').children().remove();
+			varLength = 0;
+			$('#id_dt1').append("<h3 style='background-color:rgb(88,88,88); color:white;'>lock variables</h3>");
+			$('#id_dt2').append("<h3 style='background-color:rgb(88,88,88); color:white;'>detail views</h3>");
+			for(var x = 0; x < max[0]; x++) {
+					for(var y = max[1] - 1; y >= 0 ; y--) {
+						for(var z = max[2] - 1; z >= 0 ; z--) {
+								$('#id_dt1').append("<input id='id_b"+ ctr +"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctr +", 1);' onmouseover='func_highl("+ ctr +", 0);' onclick='func_del("+ ctr +", 0);' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
+								$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' type='text' onchange='func_invSize("+ ctr + ", 0);'> </input>");
+								$('#id_dt2').append("<input id='id_d"+ ctra+"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctra +", 1);' onmouseover='func_highl("+ ctra +", 0);' onclick='func_detail("+ ctra +", "+ x +", "+ y +", "+ z+");' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
+								$('#id_d' + ctr).css("background", "rgb(133,133,233)");
+								$('#id_b' + ctr).css("background", "rgb(133,133,233)");
+								if($('#id_s' + ctr).val().length > 0) {
+									$('#id_s' + ctr).val(parseFloat($('#id_s' + ctr).val()));
+								}
+								
+								varLength = ctr;
+								ctra++;
+								ctr++;
+							}								
+						}
+					}
+				ctr = 0;
+				$('#id_dt1').append("<h3 style='background-color:rgb(88,88,88); color:white;'>lock layers</h3>");
+				for(var x = 0; x < max[0]; x++) {
+					for(var y = max[1] - 1; y >= 0 ; y--) {
+						for(var z = max[2] - 1; z >= 0 ; z--) {
+							if(x === 0 && z < max[2]) {
+								$('#id_dt1').append('<input type="button" class="btn" id="id_lockY'+ ctr + '" style="width:147px;" value="yz'+ y +'_'+ z +'" onclick="func_lock('+x+','+y+','+ z +', 2,' + ctr+ ',1)"></input>');
+								$('#id_lockY' + ctr).css("background-color","rgb(133,133,233)");
+							}
+							if(y === 0 && z < max[2]) {
+								$('#id_dt1').append('<input type="button" class="btn" id="id_lockX'+ ctr+'" style="width:147px;" value="xz'+ x +'_'+ z +'" onclick="func_lock('+x+','+y+','+ z +',1,' + ctr+ ',0)"></input>');
+								$('#id_lockX' + ctr).css("background-color","rgb(133,133,233)");
+							}
+							ctr++;
+					}
+				}
+			}
+			ctrv = 0;
+			for(var x = 0; x < 1; x++) {
+				$('#xa').append("<form type='submit' action='#' method='GET'><input id='id_tx" + x + "' type='text' value='"+ xArr2[x] +"'></input></input></form>");
+				$('#id_tx' + x).val(xArr2[x]);
+				ctrv++;
+			}
+			for(var y = 0; y < 1; y++) {
+				
+			$('#ya').append("<form  type='submit' action='#' method='GET'><input id='id_ty" + y + "' type='text' value='"+ yArr2[y]+"'></form>");
+			$('#id_ty' + y).val(yArr2[y]);
+			ctrv++;
+			}
+			for(var z = 0; z < 1; z++) {		
+				
+				$('#za').append("<form type='submit' action='#' method='GET'><input id='id_tz" + z + "' type='text' value='"+ zArr2[z] +"'></form>");	
+				$('#id_tz' + z).val(zArr2[z]);
+				ctrv++;				
+			}
+		ctrv = 0;
+		ctr = 0;
+		for(var x = 0; x < max_x; x++) {
+			for(var y = 0; y < max_y; y++) {
+				for(var z = 0; z <= max_z; z++) {			
+					arrCtr[0][ctr] = 'd';
+					arrsz[0][ctr] = 'd';
+					arrsz[1][ctr] = 1.0;
+					ctr++;
+				}
+			}
+		}
+		func_build();
+}
+max = new Array();
+ctx1 = new Array();
+ctx2 = new Array();
+ctx3 = new Array();
+rtx1 = new Array();
+rtx2 = new Array();
+rtx3 = new Array();
+/*
+c1 = new Array();
+c2 = new Array();
+c3 = new Array();
+*/
+function func_free() {
+	if($('#id_x').val() !== "") {
+		if($('#id_y').val() !== "") {
+			if($('#id_z').val() !== "") {
+				if($('#id_tx0').val() !== "") {
+					if($('#id_ty0').val() !== "") {
+						if($('#id_tz0').val() !== "") {
+							$('#id_save').remove();
+							$('#values_xyz_id').append("<input id='id_save' type='button' class='btn' value='save' onclick='func_save();'></input>");
+							func_ok(0);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+function func_ok(req) {
+	var ctr = 0;
+	var pw = 1;
+	if(req === 0) {
+	func_build();
+		for(var x = 0; x < parseInt($('#id_x').val()); x++) {
+						for(var y = parseInt($('#id_y').val()) - 1; y >= 0 ; y--) {
+							for(var z = parseInt($('#id_z').val()) - 1; z >= 0 ; z--) {
+							arrsz[0][ctr] = 'd';
+							if(arrCtr[0][ctr] !== 'x') {
+								arrsz[1][ctr] = parseFloat($('#id_s' + ctr).val());
+							} else {
+								arrsz[1][ctr] = 1.0;
+							}
+							ctr++;	
+				}
+			}
+		}
+		ctr =0;
+			$('#id_dt1').children().remove();
+			if($('#xa').val().length <= 0 || $('#ya').val().length || $('#za').val().length) {
+			$('#xa').children().children().remove();
+			$('#ya').children().children().remove();
+			$('#za').children().children().remove();
+			$('#_a').children().remove();
+			}
+			ctr = 0;
+			ctra = 0;
+			it = 0;
+			max[0] = parseInt($('#id_x').val());
+			max[1] = parseInt($('#id_y').val());
+			max[2] = parseInt($('#id_z').val());
+			cr = 0;
+			if(lock === 0) {
+				for(var x = 0; x < max[0]; x++) {		
+					for(var y = max[1] - 1; y >= 0 ; y--) {		
+						for(var z = max[2] - 1; z >= 0 ; z--) {
+							mod[cr] = 0;
+							cr++;
+						}
+					}
+				}
+				cr = 0;
+				}
+				lock = 1;
+				$('#id_dt2').children().remove();
+				$('#id_dt1').append("<h3 style='background-color:rgb(88,88,88); color:white;'>lock variables</h3>");
+				$('#id_dt2').append("<h3 style='background-color:rgb(88,88,88); color:white;'>detail views</h3>");
+			if($('#xa').val().length <= 0 || $('#ya').val().length || $('#za').val().length) {
+			for(var x = 0; x < max[0]; x++) {
+					for(var y = max[1] - 1; y >= 0 ; y--) {
+						for(var z = max[2]- 1; z >= 0 ; z--) {
+								$('#id_dt1').append("<input id='id_b"+ ctr +"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctr +", 1);' onmouseover='func_highl("+ ctr +", 0);' onclick='func_del("+ ctr +", 0);' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
+								if(!isNaN(arrsz[1][ctr])) {
+									$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' value="+arrsz[1][ctr]+" type='text' onchange='func_invSize("+ ctr + ", 0);'> </input>");
+								} else {
+									$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' value='1.0' type='text' onchange='func_invSize("+ ctr + ", 0);'> </input>");
+								}
+								$('#id_dt2').append("<input id='id_d"+ ctra +"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctra +", 1);' onmouseover='func_highl("+ ctra +", 0);' onclick='func_detail("+ ctra +", "+ x +", "+ y +", "+ z+");' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
+								$('#id_d' + ctr).css("background", "rgb(133,133,233)");
+								$('#id_b' + ctr).css("background", "rgb(133,133,233)");
+								ctra++;
+								ctr++;
+							}								
+						}
+					}
+			ctr = 0;
+				$('#id_dt1').append("<h3 style='background-color:rgb(88,88,88); color:white;'>lock layers</h3>");
+				for(var x = 0; x < max[0]; x++) {
+					for(var y = max[1] - 1; y >= 0 ; y--) {
+						for(var z = max[2]- 1; z >= 0 ; z--) {			
+							if(x === 0 && z < max[2]) {
+								$('#id_dt1').append('<input type="button" class="btn" id="id_lockY'+ctr+'" style="width:147px;" value="yz'+ y +'_'+ z +'" onclick="func_lock('+x+','+y+','+ z +', 2,' + ctr+ ',1)"></input>');
+								$('#id_lockY' + ctr).css("background-color", "rgb(133,133,233)");
+							}
+							if(y === 0 && z < max[2]) {
+								$('#id_dt1').append('<input type="button" class="btn" id="id_lockX'+ ctr+'" style="width:147px;" value="xz'+ x +'_'+ z +'" onclick="func_lock('+x+','+y+','+ z +',1,' +ctr+ ',0)"></input>');
+								$('#id_lockX' + ctr).css("background-color","rgb(133,133,233)");
+							}
+							ctr++;
+					}
+				}
+			}
+				for(var x = 0; x < 1; x++) {
+				$('#xa').append("<form type='submit' action='#' method='GET'><input id='id_tx" + x + "' type='text' onchange='func_build();'></input></input></form>");
+				$('#id_tx' + x).val(xArr2[x]);
+				}
+				for(var y = 0; y < 1; y++) {
+				$('#ya').append("<form  type='submit' action='#' method='GET'><input id='id_ty" + y + "' type='text' onchange='func_build();'></form>");
+				$('#id_ty' + y).val(yArr2[y]);
+				}
+				for(var z = 0; z < 1; z++) {		
+					$('#za').append("<form type='submit' action='#' method='GET'><input id='id_tz" + z + "' type='text' onchange='func_build();'></form>");	
+					$('#id_tz' + z).val(zArr2[z]);
+				}
+			}
+		ctr = 0;
+		for(var x = 0; x < parseInt($('#id_x').val()); x++) {
+			for(var y = 0; y < parseInt($('#id_y').val()); y++) {
+				for(var z = 0; z < parseInt($('#id_z').val()); z++) {			
+					arrCtr[0][ctr] = 'd';
+					arrsz[0][ctr] = 'd';
+					arrsz[1][ctr] = 1.0;
+					ctr++;
+				}
+			}
+		}
+		} else {
+			pw = 1;
+			ctr = 0;
+			for(var x = max_x - 1; x >= 0; x--) {
+						for(var y = max_y - 1; y >= 0 ; y--) {
+							for(var z = max_z - 1; z >= 0 ; z--) {
+							$('#id_s' + ctr).val(parseFloat(arrInd[0][0].split(':')[ctr + 1]));
+							arrsz[0][ctr] = 'd';
+							if(arrCtr[0][ctr] !== 'x') {
+								if(arrsz[1][ctr] !== 1.0 && ctr === 0) {
+									arrsz[1][ctr] = 1.0;
+								}
+								arrsz[1][ctr] = parseFloat(arrInd[0][0].split(':')[ctr + 1]);
+							} else {
+								arrsz[1][ctr] = 1.0;
+							}
+							ctr++;	
+						}
+				}
+		}
+		if($('#xa').val().length <= 0 || $('#ya').val().length || $('#za').val().length) {
+			$('#id_dt1').children().remove();
+			$('#xa').children().children().remove();
+			$('#ya').children().children().remove();
+			$('#za').children().children().remove();
+			$('#_a').children().remove();
+		}
+			$('#id_x').val('undefined');
+			$('#id_y').val('undefined');
+			$('#id_z').val('undefined');
+			$('#id_ok').remove();
+		// -> }
+			for(var x = 0; x < parseInt($('#id_x').val()); x++) {
+			for(var y = 0; y < parseInt($('#id_y').val()); y++) {
+				for(var z = 0; z < parseInt($('#id_z').val()); z++) {			
+					arrCtr[0][ctr] = 'd';
+					arrsz[0][ctr] = 'd';
+					arrsz[1][ctr] = 1.0;
+					ctr++;
+				}
+			}
+		}
+			
+		}
+		func_reset();
+		//$('#values_xyz_id').append("<input type='button' class='btn' value='ok' onclick='func_build();'></input></form>");
+		func_build();
+}
+				
+func_empVal = function(pl,v1,v2) {
+	for(var it_0 = 0; it_0 < parseInt($('#id_x').val()); it_0++) {
+		for(var it_1 =  0; it_1 < parseInt($('#id_y').val()); it_1++) {
+			for(var it_2 = 0; it_2 < parseInt($('#id_z').val()); it_2++) {
+				if(arrCtr[0][ci1] !== 'x') {
+					arrVals[it_0][it_1][it_2] = parseFloat(arrsz[1][ci1]);
+				} else {
+					arrVals[it_0][it_1][it_2] = 0.0;
+				}
+				ci1++;
+			}	
+		}
+	}	
+	ci1= 0;
+		if(pl === "xy") {
+			for(var it_2 = 0; it_2 < parseInt($('#id_z').val()); it_2++) {
+				res_xy[v1][v2][0] += arrVals[v1][v2][it_2];
+			}
+		}
+	
+		if(pl === "yz") {
+			for(var it_0 = 0; it_0 < parseInt($('#id_x').val()); it_0++) {
+				res_zy[0][v1][v2] += arrVals[it_0][v1][v2];
+			}
+		}
+	
+		if(pl === "xz") {
+			for(var it_1 = 0; it_1 < parseInt($('#id_y').val()); it_1++) {
+				res_zx[v1][0][v2] += arrVals[v1][it_1][v2];
+			}
+		}		
+}
+func_inEmp = function() {
+			for(var it_0 = 0; it_0 < parseInt($('#id_x').val()); it_0++) {
+				res_zy[0] = new Array();
+				arrVals[it_0] = new Array();
+				ctx1[it_0] = new Array();
+				rtx1[it_0] = new Array();
+				//c1[it_0] = new Array();
+				res_xy[it_0] = new Array();
+				res_zx[it_0] = new Array();
+				for(var it_1 = 0; it_1 <  parseInt($('#id_y').val()); it_1++) {
+					//c2[it_1] = new Array();
+					res_zx[it_0][0] = new Array();
+					res_xy[it_0][it_1] = new Array();
+					res_zy[0][it_1] = new Array();
+					arrVals[it_0][it_1] = new Array();
+					for(var it_2 = 0; it_2 < parseInt($('#id_z').val()); it_2++) {
+						ctx2[it_2] = new Array();
+						rtx2[it_2] = new Array();
+						ctx3[it_2] = new Array();
+						rtx3[it_2] = new Array();
+						//c3[it_2] = new Array();
+						res_xy[it_0][it_1][0] = 0.0;
+						res_zy[0][it_1][it_2] = 0.0;
+						res_zx[it_0][0][it_2] = 0.0;
+					}
+				}
+			}	
+ci1 = 0;
+}
+var canvas1;
+var canvas2;
+var canvas3;
+func_EmpFld = function() {
+	$('#id_anal1').children().remove();
+	$('#id_anal2').children().remove();
+	$('#id_anal3').children().remove();
+	$('#btn_hide').remove();
+	rt1 = 0;
+	func_inEmp();		
+		if($('#id_x').val() !== "" && $('#id_y').val() !== "" && $('#id_z').val() !== "" ) {
+			for(it_x = 0; it_x < parseInt($('#id_x').val()); it_x++) {
+				for(it_y = 0; it_y < parseInt($('#id_y').val()); it_y++) {
+					func_empVal("xy", it_x, it_y);						
+				}
+			}
+			for(it_z = 0; it_z < parseInt($('#id_z').val()); it_z++) {
+				for(it_y = 0; it_y < parseInt($('#id_y').val()); it_y++) {
+					func_empVal("yz", it_y, it_z);					
+				}
+			}
+			for(it_z = 0; it_z < parseInt($('#id_z').val()); it_z++) {
+				for(it_x = 0; it_x < parseInt($('#id_x').val()); it_x++) {					
+					func_empVal("xz", it_x, it_z);
+				}
+			}
+			for(it_x = 0; it_x < parseInt($('#id_x').val()); it_x++) {
+				for(it_y = 0; it_y < parseInt($('#id_y').val()); it_y++) {
+					rtx1[it_x][it_y] = new Tooltip(0,canvas1,20,20,22*it_x,(22*it_y),res_xy[it_x][it_y][0],0,255*(parseInt($('#id_z').val()) * parseInt(res_xy[it_x][it_y][0]))/255,255*(parseInt($('#id_z').val()) * parseInt(res_xy[it_x][it_y][0]))/255);
+				}
+			}
+			for(it_z = 0; it_z < parseInt($('#id_z').val()); it_z++) {
+				for(it_y = 0; it_y < parseInt($('#id_y').val()); it_y++) {
+					rtx2[it_z][it_y] = new Tooltip(1,canvas2,20,20, (parseInt($('#id_z').val()-1)*22)-(22*it_z),(22*it_y),res_zy[0][it_y][it_z],0,255*(parseInt($('#id_x').val()) * parseInt(res_zy[0][it_y][it_z]))/255,255*(parseInt($('#id_x').val()) * parseInt(res_zy[0][it_y][it_z]))/255);
+				}
+			}
+			for(it_z = 0; it_z < parseInt($('#id_z').val()); it_z++) {
+				for(it_x = 0; it_x < parseInt($('#id_x').val()); it_x++) {	
+					rtx3[it_x][it_z] = new Tooltip(2,canvas3,20,20, 22*it_x,22*it_z,res_zx[it_x][0][it_z],0,255*(parseInt($('#id_y').val()) * parseInt(res_zx[it_x][0][it_z]))/255,255*(parseInt($('#id_y').val()) * parseInt(res_zx[it_x][0][it_z]))/255);
+				}
+			}
+			for(var it_0 = 0; it_0 < parseInt($('#id_x').val()); it_0++) {
+				for(var it_1 =parseInt($('#id_y').val()) - 1; it_1 >= 0 ; it_1--) {
+					for(var it_2 = parseInt($('#id_z').val()) - 1; it_2 >= 0; it_2--) {
+						res_xy[it_0][it_1][0] = 0.0;
+						res_zy[0][it_1][it_2] = 0.0;
+						res_zx[it_0][0][it_2] = 0.0;
+					}
+				}
+			}	
+		}
+		$('#id_grid').show();
+}
+var cx1 = 0;
+var cx2 = 0;
+var cx3 = 0;
+function showx (e,t,l) {  /* added argument */
+		$('#id_c1'+ t + '_' + l).css("display", "true"); /* changed variable to argument */
+		$('#id_c2'+ t + '_' + l).css("display", "true"); /* changed variable to argument */
+		$('#id_c3'+ t + '_' + l).css("display", "true"); /* changed variable to argument */	
+}
+function hidex (e,t,l) { /* added argument */
+		$('#id_c1'+ t + '_' + l).css("display", "none"); /* changed variable to argument */
+		$('#id_c2'+ t + '_' + l).css("display", "none"); /* changed variable to argument */
+		$('#id_c3'+ t + '_' + l).css("display", "none"); /* changed variable to argument */
+}
+var rt1 = 0;
+var rt2 = 0;
+var rt3 = 0;
+function func_hideEmp() {
+	$('#id_grid').hide();
+}
+function Tooltip(c,e,w,h,t,l,v,r,g,b) {
+	
+	function getPos(c,t,l) {
+		var posArr = new Array();
+		posArr[0] = c;
+		posArr[1] = t;
+		posArr[2] = l;
+		return posArr;
+	}
+	if(rt1 == 0) {
+		$("#id_anal1").css("height", 22*$('#id_y').val() + 22);
+		$("#id_anal1").append("<h3 style='background-color:rgb(88,88,88); color:white;'>xy - view (sum: z)</h3>");
+		$("#id_anal2").css("height", 22*$('#id_y').val() + 27);
+		$("#id_anal2").append("<h3 style='background-color:rgb(88,88,88); color:white;'>yz - view (sum: x)</h3>");
+		$("#id_anal3").css("height", 22*$('#id_z').val() + 44);
+		$("#id_anal3").append("<h3 style='background-color:rgb(88,88,88); color:white;'>xz - view (sum: y)</h3>");
+		$('#id_grid').append("<input type='button' id='btn_hide' class='btn' value='hide analysis' onclick='func_hideEmp()'></input>");
+		rt1 = 1;
+	}
+	
+	if(c === 0) {
+		$("#id_anal1").append('<a href="#" id="id_c1'+ t + '_' + l +'" data-toggle="tooltip" title="'+v+'" ></a> ');
+		$('#id_c1'+ t + '_' + l).css("position", "absolute");
+		$('#id_c1'+ t + '_' + l).css("background-color", "rgb(" + r + "," + g + "," + b + ")");
+		$('#id_c1'+ t + '_' + l).css("top", l + 44);
+		$('#id_c1'+ t + '_' + l).css("left", t + 22);
+		$('#id_c1'+ t + '_' + l).css("width", 20);
+		$('#id_c1'+ t + '_' + l).css("height", 20);
+
+		
+	}
+	if(c === 1) {
+		$("#id_anal2").append('<a href="#" id="id_c2'+ t + '_' + l +'" data-toggle="tooltip" title="'+v+'" ></a> ');		
+		$('#id_c2'+ t + '_' + l).css("position", "absolute");
+		$('#id_c2'+ t + '_' + l).css("background-color", "rgb(" + r + "," + g + "," + b + ")");
+		$('#id_c2'+ t + '_' + l).css("top", + l + 22*$('#id_y').val() + 88);
+		$('#id_c2'+ t + '_' + l).css("left", + t + 22);
+		$('#id_c2'+ t + '_' + l).css("width", 20);
+		$('#id_c2'+ t + '_' + l).css("height", 20);
+
+		
+	}
+	if(c === 2) {
+		$("#id_anal3").append('<a href="#" id="id_c3'+ t + '_' + l +'" data-toggle="tooltip" title="'+v+'" ></a> ');
+		$('#id_c3'+ t + '_' + l).css("position", "absolute");
+		$('#id_c3'+ t + '_' + l).css("background-color", "rgb(" + r + "," + g + "," + b + ")");
+		$('#id_c3'+ t + '_' + l).css("top",  + l + 22*$('#id_y').val() + 22*$('#id_y').val() + 132);
+		$('#id_c3'+ t + '_' + l).css("left", + t + 22);
+		$('#id_c3'+ t + '_' + l).css("width", 20);
+		$('#id_c3'+ t + '_' + l).css("height", 20);		
+	}
+
+}
+function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+
+function init() {
+		container = document.createElement( 'div' );
+		$('#id_frame').append( container );
+
+		var info = document.createElement( 'div' );
+		info.style.position = 'absolute';
+		info.style.top = '10px';
+		info.style.width = '100%';
+		info.style.textAlign = 'center';
+		// info.innerHTML = 'Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br>Drag to spin the text';
+		renderer.setClearColor( 0xffffff, 1 );
+		container.appendChild( info );
+		func_choose();
+		$('#values_xyz_id').append("<form type='submit' method='GET' action='#'><div id='xa'><input id='id_x' type='number'>x-Axis</input></div><div id='ya'><input id='id_y' type='number'>y-Axis</input></div><div id='za'><input id='id_z' type='number'>z-Axis</input></div><input type='button' class='btn' value='set' onclick='func_free()'></input>");
+		for(var x = 0; x < 1; x++) {
+			$('#xa').append("<form type='submit' action='#'  method='GET'><input id='id_tx" + x + "' type='text' placeholder='x_cmpname'></input></form>");
+		}
+		for(var y = 0; y < 1; y++) {
+			$('#ya').append("<form  type='submit' action='#'  method='GET'><input id='id_ty" + y + "' type='text' placeholder='y_cmpname'></input></form>");
+		}
+		for(var z = 0; z < 1; z++) {		
+			$('#za').append("<form type='submit' action='#'  method='GET'><input id='id_tz" + z + "' type='text' placeholder='z_cmpname'></input></form>");	
+		}
+}
+var check = 0;
+var sw = 0;
+   function onDocumentMouseMove(event) {
+			if(check === 1) {
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+			} else {
+			
+			}
+	}
+	function onDocumentMouseClick(event) {
+		$( "#id_canv" ).click(function() {
+			if(sw % 2 === 0) {
+				check = 1;
+			} else {
+				check = 0;
+			}
+		});
+		sw++;
+	}
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.0005;
+				
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+</script>
+</body>
+</html>
