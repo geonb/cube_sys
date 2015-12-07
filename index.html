@@ -1179,6 +1179,14 @@ function func_detail(val, x, y, z) {
 function func_lookup(val) {
 	console.log($('#scrtag' + val).val());
 }
+function minmax(value, min, max) 
+{
+    if(parseInt(value) < min || isNaN(value)) 
+        return 0; 
+    else if(parseInt(value) > max) 
+        return 999999; 
+    else return value;
+}
 function func_req_one() {
 	$('#id_dt1').children().remove();
 	$('#id_dt2').children().remove();
@@ -1213,7 +1221,7 @@ function func_req_one() {
 					for(var y = max[1] - 1; y >= 0 ; y--) {
 						for(var z = max[2] - 1; z >= 0 ; z--) {
 								$('#id_dt1').append("<input id='id_b"+ ctr +"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctr +", 1);' onmouseover='func_highl("+ ctr +", 0);' onclick='func_del("+ ctr +", 0);' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
-								$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' type='text' onchange='func_invSize("+ ctr + ", 0);'> </input>");
+								$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' type='number' min='0' onkeyup='this.value = minmax(this.value, 0, 999999);' max='9999999' onchange='func_invSize("+ ctr + ", 0);'> </input>");
 								$('#id_dt2').append("<input id='id_d"+ ctra+"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctra +", 1);' onmouseover='func_highl("+ ctra +", 0);' onclick='func_detail("+ ctra +", "+ x +", "+ y +", "+ z+");' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
 								$('#id_d' + ctr).css("background", "rgb(133,133,233)");
 								$('#id_b' + ctr).css("background", "rgb(133,133,233)");
@@ -1359,9 +1367,9 @@ function func_ok(req) {
 						for(var z = max[2]- 1; z >= 0 ; z--) {
 								$('#id_dt1').append("<input id='id_b"+ ctr +"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctr +", 1);' onmouseover='func_highl("+ ctr +", 0);' onclick='func_del("+ ctr +", 0);' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
 								if(!isNaN(arrsz[1][ctr])) {
-									$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' value="+arrsz[1][ctr]+" type='text' onchange='func_invSize("+ ctr + ", 0);'> </input>");
+									$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' value="+arrsz[1][ctr]+" type='number' min='0' onkeyup='this.value = minmax(this.value, 0, 999999);' max='9999999' onchange='func_invSize("+ ctr + ", 0);'> </input>");
 								} else {
-									$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' value='1.0' type='text' onchange='func_invSize("+ ctr + ", 0);'> </input>");
+									$('#id_dt1').append("<input id='id_s"+ ctr +"' style='width:140px;' value='1.0' type='number' min='0' onkeyup='this.value = minmax(this.value, 0, 999999);' max='9999999' onchange='func_invSize("+ ctr + ", 0);'> </input>");
 								}
 								$('#id_dt2').append("<input id='id_d"+ ctra +"' style='width:290px;' type='button' class='btn' onmouseout='func_highl("+ ctra +", 1);' onmouseover='func_highl("+ ctra +", 0);' onclick='func_detail("+ ctra +", "+ x +", "+ y +", "+ z+");' value=' "+ xArr[x] +" "+ yArr[y] +" "+ zArr[z] +" ' ></input>");
 								$('#id_d' + ctr).css("background", "rgb(133,133,233)");
