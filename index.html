@@ -1568,7 +1568,7 @@ func_EmpFld = function() {
 			}
 			for(it_z = 0; it_z < parseInt($('#id_z').val()); it_z++) {
 				for(it_x = 0; it_x < parseInt($('#id_x').val()); it_x++) {	
-					rtx3[it_x][it_z] = new Tooltip(2,canvas3,20,20, 22*it_x,22*it_z,res_zx[it_x][0][it_z],0,255*(parseInt($('#id_y').val()) * parseInt(res_zx[it_x][0][it_z]))/255,255*(parseInt($('#id_y').val()) * parseInt(res_zx[it_x][0][it_z]))/255);
+					rtx3[it_z][it_x] = new Tooltip(2,canvas3,20,20, 22*it_x,22*it_z,res_zx[it_x][0][it_z],0,255*(parseInt($('#id_y').val()) * parseInt(res_zx[it_x][0][it_z]))/255,255*(parseInt($('#id_y').val()) * parseInt(res_zx[it_x][0][it_z]))/255);
 				}
 			}
 			for(var it_0 = 0; it_0 < parseInt($('#id_x').val()); it_0++) {
