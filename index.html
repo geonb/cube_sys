@@ -133,9 +133,17 @@ func_list = function() {
 		});
 }
 var file;
+function stopRKey(evt) { 
+  var evt = (evt) ? evt : ((event) ? event : null); 
+  var node = (evt.target) ? evt.target : ((evt.srcElement) ? evt.srcElement : null); 
+  if ((evt.keyCode == 13) && (node.type=="text"))  {return false;} 
+} 
+
+document.onkeypress = stopRKey; 
+
 function func_save() {
 	$('#id_filen').remove();
-	$('#values_xyz_id').append("<form action='#' method='GET'><input id='id_filen' type='text' placeholder='filename'><input type='button' onclick='func_file()' value='submit'></a></input></form>");
+	$('#values_xyz_id').append("<form id='form_id' action='' method='GET'><input id='id_filen' type='text' placeholder='filename'><input type='button' onclick='func_file()' value='submit'></a></input></form>");
 }
 function func_getArr() {
 	arr = new Array();
