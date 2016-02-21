@@ -1,5 +1,5 @@
-<?php
-	//session_start();
+﻿<?php
+	session_start();
 	if (!isset($_GET['id'])) { 
 	    $_GET['id'] = 1;                 // Wenn id nicht gesetzt, auf 1 setzen 
 	} else { 
