@@ -84,7 +84,8 @@ mz = 0;
 			document.addEventListener( 'click', onDocumentMouseClick, false );
 			
 			init();
-			var bool = false;
+			
+				var bool = false;
 			
 	var rotObjectMatrix;
 function rotateAroundObjectAxis(object, axis, radians) {
@@ -155,12 +156,14 @@ function func_getArr() {
 	arr[0][1] = ":" + $('#id_y').val();
 	arr[0][2] = ":" + $('#id_z').val();
 	
-	arr[1][0] = ":" + $('#id_tx0').val();
-	arr[1][1] = ":" + $('#id_ty0').val();
-	arr[1][2] = ":" + $('#id_tz0').val();
 	for(var ix = 0; ix < $('#id_x').val(); ix++) {
+	arr[1][0] = ":" + $('#id_tx' + ix).val();
+	
 		for(var iy = 0; iy < $('#id_y').val(); iy++) {
+		arr[1][1] = ":" + $('#id_ty' + iy).val();
+	
 			for(var iz = 0; iz < $('#id_z').val(); iz++) {
+			arr[1][2] = ":" + $('#id_tz' + iz).val();
 				arr[2][ctx] = ":" + $('#id_s' + ctx).val();
 				ctx++;
 			}
@@ -358,7 +361,6 @@ function func_ok_manual() {
 	var arrXYZ = new Array();
 	
 	function func_build() {
-	
 	func_ok_manual();
 	if(request_status === 0) {
 	arrXYZ[0] = parseInt(-$('#id_x').val())*560 / 2;
@@ -374,12 +376,14 @@ function func_ok_manual() {
 		group3 = new THREE.Group();
 		ctr = 0;
 		ctr = 0;
-			for(var x = 0, z = 0; x < parseInt($('#id_x').val()); x++, z++) {
+		
+			for(var x = 0; x < parseInt($('#id_x').val()); x++) {
 				data[x] = new Array();
 				if(parseInt($('#id_x').val()) !== 0) {
-				dtext_x[x] = "x:" + x + " " + $('#id_tx' + 0).val();
-				xArr[x] = "x:" + x + " " + $('#id_tx' + 0).val();
-				xArr2[x] = $('#id_tx' + 0).val();
+					
+				dtext_x[x] = "x:" + x + " " + $('#id_tx' + x).val();
+				xArr[x] = "x:" + x + " " + $('#id_tx' + x).val();
+				xArr2[x] = $('#id_tx' + x).val();
 				text3d_x[x] = new THREE.TextGeometry( xArr[x], {
 
 								size: 100,
@@ -402,9 +406,11 @@ function func_ok_manual() {
 				for(var y = 0; y < parseInt($('#id_y').val()); y++) {
 					data[y] = new Array();
 					if(parseInt($('#id_y').val()) !== 0) {
-					yArr[y] = "y:" + y + " " + $('#id_ty' + 0).val(); // utf-8 String.fromCharCode(0x25B6)
-					yArr2[y] = $('#id_ty' + 0).val(); 
-					dtext_y[y] = "y:" + y + " " + $('#id_ty' + 0).val();
+						
+					
+					yArr[y] = "y:" + y + " " + $('#id_ty' + y).val(); // utf-8 String.fromCharCode(0x25B6)
+					yArr2[y] = $('#id_ty' + y).val(); 
+					dtext_y[y] = "y:" + y + " " + $('#id_ty' + y).val();
 					text3d_y[y] = new THREE.TextGeometry( yArr[y], {
 
 								size: 100,
@@ -417,18 +423,21 @@ function func_ok_manual() {
 					var centerOffset = -0.5 * ( text3d_y[y].boundingBox.max.x - text3d_y[y].boundingBox.min.x );
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0.8 * 0x000000, overdraw: 0.5 } );
 					text_y[y] = new THREE.Mesh( text3d_y[y], textMaterial );
-							text_y[y].position.x = arrXYZ[0] -($('#id_ty' + 0).val().length*110) - 560;
+							text_y[y].position.x = arrXYZ[0] -(15*110) - 560;
 							text_y[y].position.y = arrXYZ[1] + 0 + (560 * y);
 							text_y[y].position.z = arrXYZ[2] + -2000 + (parseInt($('#id_z').val()))*560;								
 							group.add( text_y[y] );	
 						}
 					}
+					
 					for(var z = 0; z < parseInt($('#id_z').val()); z++) {
 					data[z] = new Array();
 					if(parseInt($('#id_z').val()) !== 0) {
-							zArr[z] = "z:" + z + " " + $('#id_tz' + 0).val();
-							zArr2[z] = $('#id_tz' + 0).val();
-							dtext_z[z] = "z:" + z + " " + $('#id_tz' + 0).val();
+							
+					
+							zArr[z] = "z:" + z + " " + $('#id_tz' + z).val();
+							zArr2[z] = $('#id_tz' + z).val();
+							dtext_z[z] = "z:" + z + " " + $('#id_tz' + z).val();
 							text3d_z[z] = new THREE.TextGeometry( zArr[z], {
 
 								size: 100,
@@ -794,8 +803,9 @@ group3.add(mesh3[ctr3]);			helper3[ctr3] = new THREE.BoxHelper(mesh2[ctr3]);
 		renderer.setClearColor( 0xffffff, 1 );
         $('#id_frame').append( renderer.domElement );
 				animate();
-		}
+	}
 }
+
 var arrCtr = new Array();
 arrCtr[0] = new Array();
 arrCtr[1] = new Array();
@@ -1307,19 +1317,39 @@ function func_free() {
 	if($('#id_x').val() !== "") {
 		if($('#id_y').val() !== "") {
 			if($('#id_z').val() !== "") {
-				if($('#id_tx0').val() !== "") {
-					if($('#id_ty0').val() !== "") {
-						if($('#id_tz0').val() !== "") {
-							$('#id_save').remove();
+			if($('#id_x').val() != $('#xa').children().length) {
+			for(x = $('#xa').children().length; x < $('#id_x').val(); x++) {
+				$('#xa').append("<input class='cl_x' id='id_tx" + x + "' type='text' placeholder='x_cmpname'></input>");
+			}
+					
+						
+		
+		
+		
+		
+		
+		
+							
+				}
+				if($('#id_y').val() != $('#ya').children().length) {
+				for(y = $('#ya').children().length; y < $('#id_y').val(); y++) {
+			$('#ya').append("<input class='cl_y' id='id_ty" + y + "' type='text' placeholder='y_cmpname'></input>");
+				}
+				}
+				if($('#id_z').val() != $('#za').children().length) {
+				for(z = $('#za').children().length; z < $('#id_z').val(); z++) {
+			$('#za').append("<input class='cl_z' id='id_tz" + z + "' type='text' placeholder='z_cmpname'></input>");
+				}
+				}
+						$('#id_save').remove();
 							$('#values_xyz_id').append("<input id='id_save' type='button' class='btn' value='save' onclick='func_save();'></input>");
 							func_ok(0);
 						}
+						
 					}
 				}
 			}
-		}
-	}
-}
+		
 function func_ok(req) {
 	var ctr = 0;
 	var pw = 1;
@@ -1404,15 +1434,12 @@ function func_ok(req) {
 				}
 			}
 				for(var x = 0; x < 1; x++) {
-				$('#xa').append("<form type='submit' action='#' method='GET'><input id='id_tx" + x + "' type='text' onchange='func_build();'></input></input></form>");
 				$('#id_tx' + x).val(xArr2[x]);
 				}
 				for(var y = 0; y < 1; y++) {
-				$('#ya').append("<form  type='submit' action='#' method='GET'><input id='id_ty" + y + "' type='text' onchange='func_build();'></form>");
 				$('#id_ty' + y).val(yArr2[y]);
 				}
 				for(var z = 0; z < 1; z++) {		
-					$('#za').append("<form type='submit' action='#' method='GET'><input id='id_tz" + z + "' type='text' onchange='func_build();'></form>");	
 					$('#id_tz' + z).val(zArr2[z]);
 				}
 			}
@@ -1683,16 +1710,7 @@ function init() {
 		renderer.setClearColor( 0xffffff, 1 );
 		container.appendChild( info );
 		func_choose();
-		$('#values_xyz_id').append("<form type='submit' method='GET' action='#'><div id='xa'><input id='id_x' type='number'>x-Axis</input></div><div id='ya'><input id='id_y' type='number'>y-Axis</input></div><div id='za'><input id='id_z' type='number'>z-Axis</input></div><input type='button' class='btn' value='set' onclick='func_free()'></input>");
-		for(var x = 0; x < 1; x++) {
-			$('#xa').append("<form type='submit' action='#'  method='GET'><input id='id_tx" + x + "' type='text' placeholder='x_cmpname'></input></form>");
-		}
-		for(var y = 0; y < 1; y++) {
-			$('#ya').append("<form  type='submit' action='#'  method='GET'><input id='id_ty" + y + "' type='text' placeholder='y_cmpname'></input></form>");
-		}
-		for(var z = 0; z < 1; z++) {		
-			$('#za').append("<form type='submit' action='#'  method='GET'><input id='id_tz" + z + "' type='text' placeholder='z_cmpname'></input></form>");	
-		}
+		$('#values_xyz_id').append("<input id='id_x' type='number'>x-Axis</input><div id='xa'></div><input id='id_y' type='number'>y-Axis</input><div id='ya'></div><input id='id_z' type='number'>z-Axis</input><div id='za'></div><input type='button' class='btn' value='set' onclick='func_free()'></input>");		
 }
 var check = 0;
 var sw = 0;
@@ -1740,3 +1758,4 @@ var sw = 0;
 </script>
 </body>
 </html>
+
